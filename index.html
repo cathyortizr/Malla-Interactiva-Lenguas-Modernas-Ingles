@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Malla Curricular - Lenguas Modernas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f3e8ff, #e6f0ff);
+      color: #3a2a57;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      padding: 20px 30px;
+      background-color: #7e57c2;
+      color: white;
+      box-shadow: 0 2px 8px rgba(126, 87, 194, 0.3);
+    }
+    header img {
+      height: 60px;
+      margin-right: 20px;
+      filter: drop-shadow(0 0 2px rgba(255 255 255 / 0.7));
+    }
+    header h1 {
+      font-weight: 600;
+      font-size: 1.7rem;
+      margin: 0;
+      letter-spacing: 0.04em;
+    }
+    .stats {
+      padding: 15px 30px;
+      background: white;
+      border-bottom: 2px solid #7e57c2;
+      display: flex;
+      justify-content: space-around;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #5a3eaa;
+    }
+    .container {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding: 25px 30px;
+      scrollbar-width: thin;
+      scrollbar-color: #7e57c2 #ddd;
+    }
+    .container::-webkit-scrollbar {
+      height: 8px;
+    }
+    .container::-webkit-scrollbar-thumb {
+      background: #7e57c2;
+      border-radius: 4px;
+    }
+    .semester {
+      background: white;
+      border-radius: 12px;
+      min-width: 220px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(126, 87, 194, 0.15);
+      transition: transform 0.3s ease;
+    }
+    .semester h3 {
+      font-size: 1.15rem;
+      margin-bottom: 15px;
+      color: #7e57c2;
+      text-align: center;
+      font-weight: 700;
+    }
+    .course {
+      background: #e6dcff;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 1px 5px rgba(126, 87, 194, 0.2);
+      position: relative;
+      font-weight: 600;
+      color: #3a2a57;
+      transition: background-color 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    .course:hover:not(.locked) {
+      background: #a38ddb;
+      color: white;
+      box-shadow: 0 6px 12px rgba(126, 87, 194, 0.35);
+      transform: translateY(-3px);
+    }
+    .course.approved {
+      background: #6a3dcd;
+      color: white;
+      box-shadow: 0 6px 15px rgba(106, 61, 205, 0.5);
+      transform: scale(1.04);
+    }
+    .course.locked {
+      background: #ccc;
+      color: #777;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .course .edit-icon {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 14px;
+      color: #4b3b85;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+      user-select: none;
+    }
+    .course .edit-icon:hover {
+      opacity: 1;
+    }
+    .tooltip {
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4b3b85;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 10;
+    }
+    .course.locked:hover .tooltip {
+      opacity: 1;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: white;
+      padding: 25px 30px;
+      border-radius: 15px;
+      box-shadow: 0 12px 40px rgba(126, 87, 194, 0.3);
+      z-index: 50;
+      width: 300px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .modal.show {
+      display: block;
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 8px 10px;
+      margin-bottom: 14px;
+      border: 2px solid #7e57c2;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .modal textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .modal button {
+      background: #7e57c2;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .modal button:hover {
+      background: #6a3dcd;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(75, 59, 133, 0.6);
+      z-index: 40;
+      backdrop-filter: blur(3px);
+      transition: opacity 0.3s ease;
+    }
+    .overlay.show {
+      display: block;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1d/Escudo_de_la_UASD.svg" alt="Logo UASD" />
+    <h1>Licenciatura en Lenguas Modernas, mención Inglés - UASD</h1>
+  </header>
+  <div class="stats">
+    <div id="gpa">PGA: <strong id="gpaVal">0.00</strong></div>
+    <div id="progress">Progreso: <strong id="progressVal"></strong></div>
+  </div>
+  <div class="container" id="curriculum"></div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="modal" id="modal">
+    <h3>Información de la materia</h3>
+    <input id="modal-prof" placeholder="Nombre del profesor" />
+    <input id="modal-sem" placeholder="Semestre" />
+    <input id="modal-grade" placeholder="Nota final (0-100)" type="number" min="0" max="100" />
+    <textarea id="modal-review" placeholder="Opinión (1-5 estrellas)"></textarea>
+    <button onclick="saveCourseInfo()">Guardar</button>
+    <button onclick="closeModal()">Cerrar</button>
+  </div>
+
+  <script>
+    const courses = [
+      { name: "Orientación Institucional", semester: 1, prereq: [] },
+      { name: "Educación Física", semester: 1, prereq: [] },
+      { name: "Introducción a la Filosofía", semester: 1, prereq: [] },
+      { name: "Técnica de Investigación y Estudio", semester: 1, prereq: [] },
+      { name: "Inglés Elemental I", semester: 1, prereq: [] },
+      { name: "Francés Elemental I", semester: 1, prereq: [] },
+      { name: "Lengua Española Básica I", semester: 1, prereq: [] },
+      { name: "Introducción a las Ciencias Sociales", semester: 1, prereq: [] },
+
+      { name: "Biología Básica", semester: 2, prereq: [] },
+      { name: "Física Básica", semester: 2, prereq: [] },
+      { name: "Fundamentos de Historia Social Dominicana", semester: 2, prereq: [] },
+      { name: "Inglés Elemental II", semester: 2, prereq: ["Inglés Elemental I"] },
+      { name: "Francés Elemental II", semester: 2, prereq: ["Francés Elemental I"] },
+      { name: "Lengua Española Básica II", semester: 2, prereq: ["Lengua Española Básica I"] },
+
+      { name: "Historia de la Cultura Universal", semester: 3, prereq: ["Fundamentos de Historia Social Dominicana"] },
+      { name: "Inglés Intermedio I", semester: 3, prereq: ["Inglés Elemental I", "Inglés Elemental II"] },
+      { name: "Francés Intermedio I", semester: 3, prereq: ["Francés Elemental I", "Francés Elemental II"] },
+      { name: "Lengua Española III", semester: 3, prereq: ["Lengua Española Básica II"] },
+      { name: "Introducción a la Lingüística General", semester: 3, prereq: ["Lengua Española Básica II"] },
+      { name: "Matemática Básica", semester: 3, prereq: [] },
+      { name: "Química Básica", semester: 3, prereq: [] },
+
+      { name: "Historia de la Cultura Dominicana I", semester: 4, prereq: ["Fundamentos de Historia Social Dominicana"] },
+      { name: "Inglés Intermedio II", semester: 4, prereq: ["Inglés Elemental I", "Inglés Elemental II", "Inglés Intermedio I"] },
+      { name: "Francés Intermedio II", semester: 4, prereq: ["Francés Elemental I", "Francés Elemental II", "Francés Intermedio I"] },
+      { name: "Morfología y Sintaxis I", semester: 4, prereq: ["Lengua Española Básica II"] },
+      { name: "Introducción a la Educación", semester: 4, prereq: [] },
+      { name: "Introducción a la Psicología", semester: 4, prereq: [] },
+
+      { name: "Metodología de la Investigación Científica", semester: 5, prereq: ["Introducción a la Filosofía"] },
+      { name: "Gramática Inglesa", semester: 5, prereq: ["Inglés Intermedio II"] },
+      { name: "Inglés Intermedio III", semester: 5, prereq: ["Inglés Elemental I", "Inglés Elemental II", "Inglés Intermedio I", "Inglés Intermedio II"] },
+      { name: "Fonética y Fonología", semester: 5, prereq: ["Introducción a la Lingüística General"] },
+      { name: "Literatura Dominicana", semester: 5, prereq: ["Introducción a la Lingüística General"] },
+      { name: "Historia de la Lengua Española I", semester: 5, prereq: ["Introducción a la Lingüística General"] },
+
+      { name: "Inglés Avanzado I", semester: 6, prereq: ["Inglés Elemental I", "Inglés Elemental II", "Inglés Intermedio I", "Inglés Intermedio II", "Inglés Intermedio III"] },
+      { name: "Composición Inglesa I", semester: 6, prereq: ["Gramática Inglesa", "Inglés Intermedio III"] },
+      { name: "Fonética Inglesa", semester: 6, prereq: ["Inglés Elemental I", "Inglés Elemental II", "Inglés Intermedio I", "Inglés Intermedio II"] },
+      { name: "Civilización Norteamericana e Inglesa", semester: 6, prereq: ["Inglés Intermedio III", "Inglés Avanzado I"] },
+      { name: "Adquisición de una Lengua Extranjera", semester: 6, prereq: ["Inglés Intermedio III"] },
+
+      { name: "Estilística Inglesa", semester: 7, prereq: ["Inglés Avanzado I", "Composición Inglesa I"] },
+      { name: "Introducción a la Literatura de Paises Angloparlantes", semester: 7, prereq: ["Composición Inglesa I"] },
+      { name: "Inglés Avanzado II", semester: 7, prereq: ["Inglés Elemental I", "Inglés Elemental II", "Inglés Intermedio I", "Inglés Intermedio II", "Inglés Intermedio III", "Inglés Avanzado I"] },
+      { name: "Metodología de la Enseñanza del Inglés", semester: 7, prereq: ["Adquisición de una Lengua Extranjera"] },
+
+      { name: "Literatura Inglesa Siglo XX", semester: 8, prereq: ["Introducción a la Literatura de Paises Angloparlantes"] },
+      { name: "Inglés Avanzado III", semester: 8, prereq: ["Inglés Elemental I", "Inglés Elemental II", "Inglés Intermedio I", "Inglés Intermedio II", "Inglés Intermedio III", "Inglés Avanzado I", "Inglés Avanzado II"] },
+      { name: "Historia del Idioma Inglés", semester: 8, prereq: ["Inglés Avanzado I"] },
+      { name: "Literatura Norteamericana Siglo XX", semester: 8, prereq: ["Introducción a la Literatura de Paises Angloparlantes"] },
+      { name: "Seminario de Tesis en Inglés", semester: 8, prereq: ["Metodología de la Enseñanza del Inglés"] },
+
+      { name: "Tesis de Grado", semester: 9, prereq: ["Seminario de Tesis en Inglés", "Inglés Avanzado III"] }
+    ];
+
+    let approved = JSON.parse(localStorage.getItem("approved") || "[]");
+    let info = JSON.parse(localStorage.getItem("info") || "{}");
+
+    let selectedCourse = null;
+
+    function openModal() {
+      const modal = document.getElementById("modal");
+      const overlay = document.getElementById("overlay");
+      overlay.classList.add("show");
+      modal.classList.add("show");
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("modal");
+      const overlay = document.getElementById("overlay");
+      modal.classList.remove("show");
+      overlay.classList.remove("show");
+    }
+
+    function render() {
+      const container = document.getElementById("curriculum");
+      container.innerHTML = "";
+      const semesters = [...new Set(courses.map(c => c.semester))].sort((a, b) => a - b);
+
+      let total = 0, done = 0, gpaSum = 0, optIdioma = 0, optOtros = 0;
+
+      semesters.forEach(sem => {
+        const div = document.createElement("div");
+        div.className = "semester";
+        div.innerHTML = `<h3>Semestre ${sem}</h3>`;
+
+        courses.filter(c => c.semester === sem).forEach(course => {
+          total++;
+          const cdiv = document.createElement("div");
+          cdiv.className = "course";
+          cdiv.textContent = course.name;
+
+          let unlocked = !course.prereq || course.prereq.every(p => approved.includes(p));
+          if (!unlocked) {
+            cdiv.classList.add("locked");
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.textContent = "Prerrequisitos: " + course.prereq.join(", ");
+            cdiv.appendChild(tooltip);
+          }
+
+          if (approved.includes(course.name)) {
+            cdiv.classList.add("approved");
+            done++;
+            if (info[course.name] && !isNaN(info[course.name].grade)) {
+              gpaSum += parseFloat(info[course.name].grade);
+            }
+            if (["Composición Inglesa II", "Francés Avanzado I", "Francés Avanzado II", "Conversación Inglesa", "Lingüística Inglesa Aplicada", "Evaluación del Aprendizaje", "Sociolingüística", "Shakespeare", "Textos Culturales En Inglés", "Literatura del Caribe Angloparlante"].includes(course.name)) {
+              optIdioma += course.credits || 3;
+            }
+            if (["Historia del Arte I", "Historia del Arte II", "Arte en Santo Domingo", "Historia Dominicana I", "Historia Dominicana II", "Historia de la Cultura Dominicana II", "Morfología y Sintaxis II", "Lengua Latina I", "Lengua Latina II", "Raíces Griegas y Latinas", "Introducción a la His Gral Lit I", "Introducción a la Literatura Española I", "Introducción a la Literatura Española II", "Curso Superior de Lengua Española I", "Redacción y Estilo", "Literatura Dominicana II", "Didáctica General", "Historia de las Ideas Políticas I", "Historia de las Ideas Políticas II", "Psicología Social I"].includes(course.name)) {
+              optOtros += course.credits || 3;
+            }
+          }
+
+          const editIcon = document.createElement("span");
+          editIcon.textContent = "✏️";
+          editIcon.className = "edit-icon";
+          editIcon.onclick = (e) => {
+            e.stopPropagation();
+            selectedCourse = course.name;
+            document.getElementById("modal-prof").value = info[course.name]?.prof || "";
+            document.getElementById("modal-sem").value = info[course.name]?.sem || "";
+            document.getElementById("modal-grade").value = info[course.name]?.grade || "";
+            document.getElementById("modal-review").value = info[course.name]?.review || "";
+            openModal();
+          };
+          cdiv.appendChild(editIcon);
+
+          cdiv.onclick = () => {
+            if (!unlocked) return;
+            const idx = approved.indexOf(course.name);
+            if (idx >= 0) {
+              cdiv.classList.remove("approved");
+              cdiv.style.transform = "scale(0.95)";
+              setTimeout(() => {
+                approved.splice(idx, 1);
+                localStorage.setItem("approved", JSON.stringify(approved));
+                render();
+              }, 150);
+            } else {
+              cdiv.style.transform = "scale(1.1)";
+              setTimeout(() => {
+                approved.push(course.name);
+                localStorage.setItem("approved", JSON.stringify(approved));
+                render();
+              }, 150);
+            }
+          };
+
+          div.appendChild(cdiv);
+        });
+        container.appendChild(div);
+      });
+
+      document.getElementById("progressVal").textContent = `${done} de ${total} materias (${Math.round((done / total) * 100)}%)`;
+      document.getElementById("gpaVal").textContent = done ? (gpaSum / done).toFixed(2) : "0.00";
+      const optMsg = `Optativas Idiomas: ${optIdioma}/12 CR – Optativas Otros: ${optOtros}/6 CR`;
+      const optDivExists = document.getElementById("optativasInfo");
+      if (optDivExists) {
+        optDivExists.innerHTML = "<strong>" + optMsg + "</strong>";
+      } else {
+        const optDiv = document.createElement("div");
+        optDiv.id = "optativasInfo";
+        optDiv.style.color = "#5a3eaa";
+        optDiv.style.fontWeight = "700";
+        optDiv.style.textAlign = "center";
+        optDiv.style.marginTop = "5px";
+        optDiv.innerHTML = "<strong>" + optMsg + "</strong>";
+        document.querySelector(".stats").appendChild(optDiv);
+      }
+    }
+
+    function saveCourseInfo() {
+      if (!selectedCourse) return;
+      info[selectedCourse] = {
+        prof: document.getElementById("modal-prof").value.trim(),
+        sem: document.getElementById("modal-sem").value.trim(),
+        grade: parseFloat(document.getElementById("modal-grade").value) || null,
+        review: document.getElementById("modal-review").value.trim()
+      };
+      localStorage.setItem("info", JSON.stringify(info));
+      closeModal();
+      render();
+    }
+
+    document.getElementById("overlay").onclick = closeModal;
+
+    render();
+  </script>
+</body>
+</html>
