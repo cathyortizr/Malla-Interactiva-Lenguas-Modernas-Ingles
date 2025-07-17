@@ -332,10 +332,10 @@
               gpaSum += parseFloat(info[course.name].grade);
             }
             if (["Composición Inglesa II", "Francés Avanzado I", "Francés Avanzado II", "Conversación Inglesa", "Lingüística Inglesa Aplicada", "Evaluación del Aprendizaje", "Sociolingüística", "Shakespeare", "Textos Culturales En Inglés", "Literatura del Caribe Angloparlante"].includes(course.name)) {
-              optIdioma += course.credits || 3;
+              optIdioma += 3;
             }
             if (["Historia del Arte I", "Historia del Arte II", "Arte en Santo Domingo", "Historia Dominicana I", "Historia Dominicana II", "Historia de la Cultura Dominicana II", "Morfología y Sintaxis II", "Lengua Latina I", "Lengua Latina II", "Raíces Griegas y Latinas", "Introducción a la His Gral Lit I", "Introducción a la Literatura Española I", "Introducción a la Literatura Española II", "Curso Superior de Lengua Española I", "Redacción y Estilo", "Literatura Dominicana II", "Didáctica General", "Historia de las Ideas Políticas I", "Historia de las Ideas Políticas II", "Psicología Social I"].includes(course.name)) {
-              optOtros += course.credits || 3;
+              optOtros += 3;
             }
           }
 
@@ -347,7 +347,7 @@
             selectedCourse = course.name;
             document.getElementById("modal-prof").value = info[course.name]?.prof || "";
             document.getElementById("modal-sem").value = info[course.name]?.sem || "";
-            document.getElementById("modal-grade").value = info[course.name]?.grade || "";
+            document.getElementById("modal-grade").value = info[course.name]?.grade ?? "";
             document.getElementById("modal-review").value = info[course.name]?.review || "";
             openModal();
           };
@@ -381,6 +381,7 @@
 
       document.getElementById("progressVal").textContent = `${done} de ${total} materias (${Math.round((done / total) * 100)}%)`;
       document.getElementById("gpaVal").textContent = done ? (gpaSum / done).toFixed(2) : "0.00";
+
       const optMsg = `Optativas Idiomas: ${optIdioma}/12 CR – Optativas Otros: ${optOtros}/6 CR`;
       const optDivExists = document.getElementById("optativasInfo");
       if (optDivExists) {
